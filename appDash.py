@@ -48,7 +48,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background'], 'font-fami
         }
     ),
 
-    html.Div(children='Mise en contexte', style={
+    html.Div(children='Projet Final pour le cours de Visualisation de Données Inf8808', style={
         'textAlign': 'center',
         'color': colors['text']
     }),

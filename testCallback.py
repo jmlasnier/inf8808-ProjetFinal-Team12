@@ -72,6 +72,8 @@ def drawBar(data, annee1, annee2):
         title={'text': str(annee2) +f" vs " + str(annee1),
         'x':0.5,
         'xanchor':'center'},
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
         )
     fig.update_xaxes(
         visible = False

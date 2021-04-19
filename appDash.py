@@ -18,7 +18,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 colors = {
     'background': '#111111',
-    'text': '#7FDBFF'
+    'text': '#000000'
 }
 
 # assume you have a "long-form" data frame
@@ -38,7 +38,7 @@ figBar = test.drawBar(dfBar, 1990, 2000)
 
 # barChart = test.draw1(0)
 
-app.layout = html.Div(style={'backgroundColor': colors['background'], 'font-family':'georgia'}, children=[
+app.layout = html.Div(style={'font-family':'georgia'}, children=[
     html.H1(
         children='Les impots au Canada',
         style={

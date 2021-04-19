@@ -16,7 +16,8 @@ def drawScatter(dfScat, year1, year2):
                     x="year", 
                     y="combineRevenuPlus", 
                     title='Paliers d\'impots Canadiens de 1928 à 2020',
-                    color_discrete_sequence=['grey'])
+                    color_discrete_sequence=['grey'],
+                    height=800)
     fig.update_traces(marker_symbol="line-ew-open")
     return fig
 
@@ -55,7 +56,8 @@ def drawBar(data, annee1, annee2):
         base = 0,
         customdata = [str(data[0])+'$',str(data[1])+'$',str(data[2])+'%',str(data[3])+'$'],
         texttemplate = "<b>%{customdata}</b>",
-        textposition = "inside"
+        textposition = "inside",
+        name = str(annee1)
         ))
     fig.add_trace(go.Bar(
         x = data1[4:8],
@@ -65,7 +67,8 @@ def drawBar(data, annee1, annee2):
         customdata = [str(data[4])+'$',str(data[5])+'$',str(data[6])+'%',str(data[7])+'$'],
         texttemplate = '<span style="margin-left:auto; margin-right:auto"><b>%{customdata}</b>',
         textposition = "auto",
-        hovertemplate = None
+        hovertemplate = None,
+        name = str(annee2)
         ))
     fig.update_layout(
         barmode = 'stack',

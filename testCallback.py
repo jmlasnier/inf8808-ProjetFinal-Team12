@@ -96,28 +96,26 @@ def select_year(df,year1,year2,revenu):
     mask2 = df['year']==year2
     df1 = df.loc[mask1]
     df2 = df.loc[mask2]
-    mask3 = (df1['combineRevenuPlus']<=revenu)&(df1['combineRevenuMoins']>=revenu)
-    mask4 = (df2['combineRevenuPlus']<=revenu)&(df2['combineRevenuMoins']>=revenu)
+    mask3 = (df1['combineRevenuPlus']<revenu)&(df1['combineRevenuMoins']>=revenu)
+    mask4 = (df2['combineRevenuPlus']<revenu)&(df2['combineRevenuMoins']>=revenu)
     dff1 = df1.loc[mask3]
     dff2 = df2.loc[mask4]
     inflation2=dff2['inflation'].tolist()[0]
     inflation1=dff1['inflation'].tolist()[0]
-    combineRevenuPlus1 = dff1['combineRevenuPlus'].tolist()[0]
     combineRevenuPlus2 = dff2['combineRevenuPlus'].tolist()[0]
-    combineRevenuMoins1 = dff1['combineRevenuMoins'].tolist()[0]
-    combineRevenuMoins2 = dff2['combineRevenuMoins'].tolist()[0]
-    combineTaux1 = dff1['combineTaux'].tolist()[0]
     combineTaux2 = dff2['combineTaux'].tolist()[0]
-    montantImpot1 = dff1['montantImpot'].tolist()[0]
     montantImpot2 = dff2['montantImpot'].tolist()[0]
     revenu2 = (revenu*inflation1)/inflation2
-    # print(revenu2)
-    # print(dff1)
-    # print(dff2)
+    dff3=df1.loc[(df1['combineRevenuPlus']<revenu2)&(df1['combineRevenuMoins']>=revenu2)]
+    combineRevenuPlus1 = dff3['combineRevenuPlus'].tolist()[0]
+    combineTaux1 = dff3['combineTaux'].tolist()[0]
+    montantImpot1 = dff3['montantImpot'].tolist()[0]
     impot1 = (revenu2-combineRevenuPlus1)*combineTaux1+montantImpot1
     impot2 = (revenu-combineRevenuPlus2)*combineTaux2+montantImpot2
-    d=[revenu2*impot2/revenu,impot1,impot1*100/revenu2,revenu2,revenu*impot1/revenu2,impot2,impot2*100/revenu,revenu]
+    d=[ revenu2*impot2/revenu, impot1, impot1*100/revenu2, revenu2, 
+        revenu*impot1/revenu2, impot2, impot2*100/revenu, revenu, year1, year2]
     data=[round(num,2) for num in d]
+    
     return data
 
 def convert_data(fileName):

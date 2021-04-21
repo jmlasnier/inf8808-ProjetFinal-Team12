@@ -6,48 +6,66 @@ import numpy as np
 
 
 def prepScatterDf():
-    df = pd.read_csv('Recension_bareme_finale.csv')
-    df = df[['year', 'combineRevenuPlus']]
+    df = pd.read_csv('Recension_bareme_finale2.csv')
+    print(df)
+    df = df[['year', 'combineRevenuMoins']]
     return df
 
 def drawScatter(dfScat, year1, year2):
     dfScat1 = dfScat.drop(dfScat[(dfScat.year == year1) | (dfScat.year == year2)].index)
     fig = px.scatter(dfScat1, 
                     x="year", 
-                    y="combineRevenuPlus", 
-                    title='Paliers d\'impots Canadiens de 1928 à 2020',
+                    y="combineRevenuMoins", 
+                    title='Paliers d\'impots Canadiens de 1928 à 2020 en dollars courant',
                     color_discrete_sequence=['grey'],
                     height=800)
     fig.update_traces(marker_symbol="line-ew-open")
+    fig.update_layout(
+        yaxis_title="Revenus",
+        xaxis_title="Année",
+    )
+
     return fig
 
 def highlightScat(df, annee1, annee2):
     dfScat = df.loc[(df['year'] == annee1) | (df['year'] == annee2)]
-    fig2 = px.scatter(dfScat, x="year", y="combineRevenuPlus", 
+    fig2 = px.scatter(dfScat, x="year", y="combineRevenuMoins", 
                     color_discrete_sequence=['red'])
     fig2.update_traces(marker_line_width=3)
     fig = drawScatter(df, annee1, annee2)
-    fig.add_trace(fig2.data[0])
+    if len(fig2.data)!=0:
+        fig.add_trace(fig2.data[0])
     fig.update_traces(marker_symbol="line-ew-open")
+# else:
+    fig = drawScatter(df, annee1, annee2)
     return fig
     
 
 def drawBar(data, annee1, annee2):
     fig = go.Figure()  # conversion back to Graph Object
-    print(data)
     max1=max(data[0],data[4])
     max2=max(data[1],data[5])
     max3=max(data[2],data[6])
     max4=max(data[3],data[7])
+
+    maximum10 = data[0]*100/max1 if max1!=0 else 0 
+    maximum21 = data[1]*100/max2 if max2!=0 else 0 
+    maximum32 = data[2]*100/max3 if max3!=0 else 0 
+    maximum43 = data[3]*100/max4 if max4!=0 else 0 
+    maximum14 = data[4]*100/max1 if max1!=0 else 0 
+    maximum25 = data[5]*100/max2 if max2!=0 else 0 
+    maximum36 = data[6]*100/max3 if max3!=0 else 0 
+    maximum47 = data[7]*100/max4 if max4!=0 else 0 
+
     data1=[
-        int(data[0]*100/max1),
-        int(data[1]*100/max2),
-        int(data[2]*100/max3),
-        int(data[3]*100/max4),
-        -int(data[4]*100/max1),
-        -int(data[5]*100/max2),
-        -int(data[6]*100/max3),
-        -int(data[7]*100/max4)]
+        maximum10,
+        maximum21,
+        maximum32,
+        maximum43,
+        -maximum14,
+        -maximum25,
+        -maximum36,
+        -maximum47]
     
     fig.add_trace(go.Bar(
         x = data1[0:4],
@@ -56,7 +74,7 @@ def drawBar(data, annee1, annee2):
         base = 0,
         customdata = [str(data[0])+'$',str(data[1])+'$',str(data[2])+'%',str(data[3])+'$'],
         texttemplate = "<b>%{customdata}</b>",
-        textposition = "inside",
+        textposition = "outside",
         name = str(annee1)
         ))
     fig.add_trace(go.Bar(
@@ -66,7 +84,7 @@ def drawBar(data, annee1, annee2):
         base = 0,
         customdata = [str(data[4])+'$',str(data[5])+'$',str(data[6])+'%',str(data[7])+'$'],
         texttemplate = '<span style="margin-left:auto; margin-right:auto"><b>%{customdata}</b>',
-        textposition = "auto",
+        textposition = "outside",
         hovertemplate = None,
         name = str(annee2)
         ))
@@ -76,8 +94,9 @@ def drawBar(data, annee1, annee2):
         'x':0.5,
         'xanchor':'center'},
         paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)'
-        )
+        plot_bgcolor='rgba(0,0,0,0)',
+        xaxis=dict(range=[-130, 130])
+    )
     fig.update_xaxes(
         visible = False
     )
@@ -92,6 +111,8 @@ def prep_data(revenu,annee1,annee2):
 def select_year(df,year1,year2,revenu):
     # TODO : Replace players in each act not in the top 5 by a
     # new player 'OTHER' which sums their line count and percentage
+    print('here')
+    print(df)
     mask1 = df['year']==year1
     mask2 = df['year']==year2
     df1 = df.loc[mask1]
@@ -112,8 +133,16 @@ def select_year(df,year1,year2,revenu):
     montantImpot1 = dff3['montantImpot'].tolist()[0]
     impot1 = (revenu2-combineRevenuPlus1)*combineTaux1+montantImpot1
     impot2 = (revenu-combineRevenuPlus2)*combineTaux2+montantImpot2
-    d=[ revenu2*impot2/revenu, impot1, impot1*100/revenu2, revenu2, 
-        revenu*impot1/revenu2, impot2, impot2*100/revenu, revenu, year1, year2]
+    d=[ revenu2*impot2/revenu, 
+        impot1, 
+        impot1*100/revenu2, 
+        revenu2, 
+        revenu*impot1/revenu2, 
+        impot2, 
+        impot2*100/revenu, 
+        revenu, 
+        year1, 
+        year2]
     data=[round(num,2) for num in d]
     
     return data

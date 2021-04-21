@@ -33,7 +33,7 @@ figScat = test.drawScatter(dfScat, 1940, 1940)
 #     paper_bgcolor=colors['background'],
 #     font_color=colors['text']
 # )
-dfBar = test.prep_data(10000, 1990, 2000)
+dfBar = test.prep_data(50000, 1990, 2000)
 figBar = test.drawBar(dfBar, 1990, 2000)
 
 # barChart = test.draw1(0)
@@ -57,19 +57,19 @@ app.layout = html.Div(style={'font-family':'georgia'}, children=[
             html.Center(html.Div([
                 html.H3('Inputs', style={'textAlign': 'center','color': colors['text']}),
                 html.Div([
-                    html.Label('Entrez un revenus'),
-                    dcc.Input(id='revenus', placeholder='Revenus', type='number', value=0, required=True)]),
+                    html.Label('Revenus'),
+                    dcc.Input(id='revenus', placeholder='Revenus', type='number', value=50000 ,min=192, required=True)]),
                 html.Br(),
                 html.Center(),
                 html.Div([
-                    html.Label('Entrez une année entre 1928 et 2020'),
-                    dcc.Input(id='annee1', placeholder='', type='number',
-                                   value='', max=2020, min=1928, required=True)]),
+                    html.Label('Année initiale'),
+                    dcc.Input(id='annee1', placeholder='Entre 1929 et 2020', type='number',
+                                   value='', max=2020, min=1929, required=True)]),
                 html.Br(),
                 html.Div([
-                    html.Label('Entrez une année entre 1928 et 2020'),
-                    dcc.Input(id='annee2', placeholder='Année 2', type='number', 
-                                   value='', max=2020, min=1928)]),
+                    html.Label('Année de comparaison'),
+                    dcc.Input(id='annee2', placeholder='Entre 1929 et 2020', type='number', 
+                                   value='', required=True, max=2020, min=1929)]),
                 html.Br(),
                 html.Br(),
                 html.Button('Submit', id='button', n_clicks=0),
@@ -101,8 +101,10 @@ def update_year(n_clicks, revenus, annee1, annee2, barFig, scatterFig):
     y1 = annee1
     annee1 = annee2
     annee2 = y1
+
     ctx = dash.callback_context
     
+
     figScatter = scatterFig
 
     if ctx.triggered:

@@ -48,9 +48,16 @@ app.layout = html.Div(style={'font-family':'georgia'}, children=[
         }
     ),
 
-    html.Div(children='Projet Final pour le cours de Visualisation de Données Inf8808', style={
+    html.Div(children=[
+        html.P('''Nous vous présentons un calculateur d’impôt historique permettant de comprendre et comparer l’évolution de l’impôt Québécois dans le temps. 
+                        Entrer dans la 1ère boîte le revenu que vous voulez comparer, dans la 2e l’année où vous avez gagné ce revenu et dans la 3e l’année de comparaison. 
+                        Le taux d’inflation de la deuxième année sera appliqué au revenu afin de pouvoir comparer les sommes entre elles. '''),
+        html.P('''Le deuxième tableau affiche toutes les années d’impositions. Vous pouvez glisser votre souris sur les petites barres horizontales 
+                    afin de connaître le revenu de chaque paliers et le taux d’imposition marginal pour chaque année.''')
+    ], style={
         'textAlign': 'center',
-        'color': colors['text']
+        'color': colors['text'],
+        'width':'50%','margin':'auto', 'padding':'10px', 'text-align':'justify'
     }),
 
     html.Div([
@@ -73,11 +80,11 @@ app.layout = html.Div(style={'font-family':'georgia'}, children=[
                 html.Br(),
                 html.Br(),
                 html.Button('Submit', id='button', n_clicks=0),
-            ],style={'width':'20%','float':'left'}, className="six columns")),
+            ],style={'width':'15%','float':'left'}, className="six columns")),
             html.Div([
                 html.H3('', id='vis1', style={ 'textAlign': 'center', 'color': colors['text'] }),
                 dcc.Graph(id='barChart', figure=figBar)
-            ],style={'width':'75%','float':'left'}, className="six columns"),
+            ],style={'width':'80%','float':'left'}, className="six columns"),
         ],style={'width':'80%','margin':'auto', 'padding':'10px'}, className="row"),
     dcc.Graph(
         id='scatterChart',

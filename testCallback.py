@@ -7,22 +7,29 @@ import numpy as np
 
 def prepScatterDf():
     df = pd.read_csv('Recension_bareme_finale2.csv')
-    print(df)
-    df = df[['year', 'combineRevenuMoins']]
+    df = df[['year', 'combineRevenuMoins', 'combineTaux']]
     return df
 
 def drawScatter(dfScat, year1, year2):
+    print(dfScat)
     dfScat1 = dfScat.drop(dfScat[(dfScat.year == year1) | (dfScat.year == year2)].index)
+    dfScat1["combineTaux"] = 100*dfScat1["combineTaux"].round(2)
+    dfScat1["combineTaux"] = dfScat1["combineTaux"].round(2)
     fig = px.scatter(dfScat1, 
                     x="year", 
                     y="combineRevenuMoins", 
                     title='Paliers d\'impots Canadiens de 1928 à 2020 en dollars courant',
                     color_discrete_sequence=['grey'],
-                    height=800)
-    fig.update_traces(marker_symbol="line-ew-open")
+                    height=800,
+                    custom_data= ['combineTaux'])
+    fig.update_traces(
+        marker_symbol="line-ew-open",
+        hovertemplate = '''Année: %{x}<br>Palier: %{y}<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
+        )
     fig.update_layout(
         yaxis_title="Revenus",
         xaxis_title="Année",
+        
     )
 
     return fig
@@ -69,7 +76,7 @@ def drawBar(data, annee1, annee2):
     
     fig.add_trace(go.Bar(
         x = data1[0:4],
-        y = ['Impôts selon les paliers de lautre année','Impôts','Taux moyen','Revenu'],
+        y = ['Impôts selon les paliers de lautre année  ' ,'Impôts  ','Taux moyen  ','Revenu  '],
         orientation = 'h',
         base = 0,
         customdata = [str(data[0])+'$',str(data[1])+'$',str(data[2])+'%',str(data[3])+'$'],
@@ -79,7 +86,7 @@ def drawBar(data, annee1, annee2):
         ))
     fig.add_trace(go.Bar(
         x = data1[4:8],
-        y = ['Impôts selon les paliers de lautre année','Impôts','Taux moyen','Revenu'],
+        y = ['Impôts selon les paliers de lautre année  ','Impôts  ','Taux moyen  ','Revenu  '],
         orientation = 'h',
         base = 0,
         customdata = [str(data[4])+'$',str(data[5])+'$',str(data[6])+'%',str(data[7])+'$'],
@@ -95,7 +102,7 @@ def drawBar(data, annee1, annee2):
         'xanchor':'center'},
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        xaxis=dict(range=[-130, 130])
+        xaxis=dict(range=[-150, 150])
     )
     fig.update_xaxes(
         visible = False
@@ -111,8 +118,6 @@ def prep_data(revenu,annee1,annee2):
 def select_year(df,year1,year2,revenu):
     # TODO : Replace players in each act not in the top 5 by a
     # new player 'OTHER' which sums their line count and percentage
-    print('here')
-    print(df)
     mask1 = df['year']==year1
     mask2 = df['year']==year2
     df1 = df.loc[mask1]

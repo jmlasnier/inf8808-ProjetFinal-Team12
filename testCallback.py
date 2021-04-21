@@ -11,7 +11,6 @@ def prepScatterDf():
     return df
 
 def drawScatter(dfScat, year1, year2):
-    print(dfScat)
     dfScat1 = dfScat.drop(dfScat[(dfScat.year == year1) | (dfScat.year == year2)].index)
     dfScat1["combineTaux"] = 100*dfScat1["combineTaux"].round(2)
     dfScat1["combineTaux"] = dfScat1["combineTaux"].round(2)
@@ -40,11 +39,8 @@ def highlightScat(df, annee1, annee2):
                     color_discrete_sequence=['red'])
     fig2.update_traces(marker_line_width=3)
     fig = drawScatter(df, annee1, annee2)
-    if len(fig2.data)!=0:
-        fig.add_trace(fig2.data[0])
+    fig.add_trace(fig2.data[0])
     fig.update_traces(marker_symbol="line-ew-open")
-# else:
-    fig = drawScatter(df, annee1, annee2)
     return fig
     
 

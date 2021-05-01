@@ -7,7 +7,7 @@ import numpy as np
 
 def prepScatterDf():
     df = pd.read_csv('Recension_bareme_finale2.csv')
-    df = df[['year', 'combineRevenuMoins', 'combineTaux']]
+    df = df[['year', 'combineRevenuMoinsAjuste', 'combineTaux']]
     return df
 
 def drawScatter(dfScat, year1, year2):
@@ -16,9 +16,11 @@ def drawScatter(dfScat, year1, year2):
     dfScat1["combineTaux"] = dfScat1["combineTaux"].round(2)
     fig = px.scatter(dfScat1, 
                     x="year", 
-                    y="combineRevenuMoins", 
+                    y="combineRevenuMoinsAjuste", 
+                    log_y = True,
+                    range_y=[5000, 10000000],
                     title='Paliers d\'impots Canadiens de 1928 à 2020 en dollars courant',
-                    color_discrete_sequence=['grey'],
+                    color_discrete_sequence=['black'],
                     height=800,
                     custom_data= ['combineTaux'])
     fig.update_traces(
@@ -26,20 +28,28 @@ def drawScatter(dfScat, year1, year2):
         hovertemplate = '''Année: %{x}<br>Palier: %{y}<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
         )
     fig.update_layout(
-        yaxis_title="Revenus",
+        yaxis_title="Revenus en échelle log",
         xaxis_title="Année",
         
     )
-
     return fig
 
 def highlightScat(df, annee1, annee2):
-    dfScat = df.loc[(df['year'] == annee1) | (df['year'] == annee2)]
-    fig2 = px.scatter(dfScat, x="year", y="combineRevenuMoins", 
+    annee1 = int(annee1)
+    annee2 = int(annee2)
+    dfScatAnnee1 = df.loc[(df['year'] == annee1)]
+    figAnnee1 = px.scatter(dfScatAnnee1, x="year", y="combineRevenuMoinsAjuste", 
                     color_discrete_sequence=['red'])
-    fig2.update_traces(marker_line_width=3)
+    figAnnee1.update_traces(marker_line_width=3)
+
+    dfScatAnnee2 = df.loc[(df['year'] == annee2)]
+    figAnnee2 = px.scatter(dfScatAnnee2, x="year", y="combineRevenuMoinsAjuste", 
+                    color_discrete_sequence=['blue'])
+    figAnnee2.update_traces(marker_line_width=3)
+
     fig = drawScatter(df, annee1, annee2)
-    fig.add_trace(fig2.data[0])
+    fig.add_trace(figAnnee1.data[0])
+    fig.add_trace(figAnnee2.data[0])
     fig.update_traces(marker_symbol="line-ew-open")
     return fig
     
@@ -72,7 +82,7 @@ def drawBar(data, annee1, annee2):
     
     fig.add_trace(go.Bar(
         x = data1[0:4],
-        y = ['Impôts selon les paliers de lautre année  ' ,'Impôts  ','Taux moyen  ','Revenu  '],
+        y = ['Impot avec taux de l\'autre annee' ,'Impôts  ','Taux moyen  ','Revenu  '],
         orientation = 'h',
         base = 0,
         customdata = [str(data[0])+'$',str(data[1])+'$',str(data[2])+'%',str(data[3])+'$'],
@@ -82,7 +92,7 @@ def drawBar(data, annee1, annee2):
         ))
     fig.add_trace(go.Bar(
         x = data1[4:8],
-        y = ['Impôts selon les paliers de lautre année  ','Impôts  ','Taux moyen  ','Revenu  '],
+        y = ['Impot avec taux de l\'autre annee','Impôts  ','Taux moyen  ','Revenu  '],
         orientation = 'h',
         base = 0,
         customdata = [str(data[4])+'$',str(data[5])+'$',str(data[6])+'%',str(data[7])+'$'],
@@ -93,7 +103,7 @@ def drawBar(data, annee1, annee2):
         ))
     fig.update_layout(
         barmode = 'stack',
-        title={'text': str(annee2) +f" vs " + str(annee1),
+        title={'text':str(annee2) +f" vs " + str(annee1),
         'x':0.5,
         'xanchor':'center'},
         paper_bgcolor='rgba(0,0,0,0)',
@@ -106,30 +116,30 @@ def drawBar(data, annee1, annee2):
     return fig
 
 def prep_data(revenu,annee1,annee2):
-    fileName = 'Recension_bareme_finale.csv'
+    fileName = 'Recension_bareme_finale2.csv'
     proc_data = convert_data(fileName)
     data = select_year(proc_data,annee1,annee2,revenu)
     return data
     
 def select_year(df,year1,year2,revenu):
-    # TODO : Replace players in each act not in the top 5 by a
-    # new player 'OTHER' which sums their line count and percentage
+    print('revenus')
+    print(revenu)
     mask1 = df['year']==year1
     mask2 = df['year']==year2
     df1 = df.loc[mask1]
     df2 = df.loc[mask2]
-    mask3 = (df1['combineRevenuPlus']<revenu)&(df1['combineRevenuMoins']>=revenu)
-    mask4 = (df2['combineRevenuPlus']<revenu)&(df2['combineRevenuMoins']>=revenu)
+    mask3 = (df1['combineRevenuMoins']<revenu)&(df1['combineRevenuPlus']>=revenu)
+    mask4 = (df2['combineRevenuMoins']<revenu)&(df2['combineRevenuPlus']>=revenu)
     dff1 = df1.loc[mask3]
     dff2 = df2.loc[mask4]
     inflation2=dff2['inflation'].tolist()[0]
     inflation1=dff1['inflation'].tolist()[0]
-    combineRevenuPlus2 = dff2['combineRevenuPlus'].tolist()[0]
+    combineRevenuPlus2 = dff2['combineRevenuMoins'].tolist()[0]
     combineTaux2 = dff2['combineTaux'].tolist()[0]
     montantImpot2 = dff2['montantImpot'].tolist()[0]
     revenu2 = (revenu*inflation1)/inflation2
-    dff3=df1.loc[(df1['combineRevenuPlus']<revenu2)&(df1['combineRevenuMoins']>=revenu2)]
-    combineRevenuPlus1 = dff3['combineRevenuPlus'].tolist()[0]
+    dff3=df1.loc[(df1['combineRevenuMoins']<revenu2)&(df1['combineRevenuPlus']>=revenu2)]
+    combineRevenuPlus1 = dff3['combineRevenuMoins'].tolist()[0]
     combineTaux1 = dff3['combineTaux'].tolist()[0]
     montantImpot1 = dff3['montantImpot'].tolist()[0]
     impot1 = (revenu2-combineRevenuPlus1)*combineTaux1+montantImpot1
@@ -151,5 +161,5 @@ def select_year(df,year1,year2,revenu):
 def convert_data(fileName):
     df = pd.read_csv(fileName)
     df.replace(np.nan,np.inf,inplace=True)
-    return df.drop(columns=['Unnamed: 6','Unnamed: 7'])
+    return df.drop(columns=['combineRevenuMoinsAjuste','combineRevenuPlusAjuste'])
 

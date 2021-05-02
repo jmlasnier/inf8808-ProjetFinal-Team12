@@ -4,13 +4,10 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 
+import preprocess
 
-def prepScatterDf():
-    df = pd.read_csv('Recension_bareme_finale2.csv')
-    df = df[['year', 'combineRevenuMoinsAjuste', 'combineTaux']]
-    return df
 
-def drawScatter(dfScat, year1, year2):
+def draw_scatter(dfScat, year1, year2):
     dfScat1 = dfScat.drop(dfScat[(dfScat.year == year1) | (dfScat.year == year2)].index)
     dfScat1["combineTaux"] = 100*dfScat1["combineTaux"].round(2)
     dfScat1["combineTaux"] = dfScat1["combineTaux"].round(2)
@@ -34,7 +31,7 @@ def drawScatter(dfScat, year1, year2):
     )
     return fig
 
-def highlightScat(df, annee1, annee2):
+def highlight_scat(df, annee1, annee2):
     annee1 = int(annee1)
     annee2 = int(annee2)
     dfScatAnnee1 = df.loc[(df['year'] == annee1)]
@@ -47,14 +44,14 @@ def highlightScat(df, annee1, annee2):
                     color_discrete_sequence=['blue'])
     figAnnee2.update_traces(marker_line_width=3)
 
-    fig = drawScatter(df, annee1, annee2)
+    fig = draw_scatter(df, annee1, annee2)
     fig.add_trace(figAnnee1.data[0])
     fig.add_trace(figAnnee2.data[0])
     fig.update_traces(marker_symbol="line-ew-open")
     return fig
     
 
-def drawBar(data, annee1, annee2):
+def draw_bar(data, annee1, annee2):
     fig = go.Figure()  # conversion back to Graph Object
     max1=max(data[0],data[4])
     max2=max(data[1],data[5])
@@ -114,52 +111,3 @@ def drawBar(data, annee1, annee2):
         visible = False
     )
     return fig
-
-def prep_data(revenu,annee1,annee2):
-    fileName = 'Recension_bareme_finale2.csv'
-    proc_data = convert_data(fileName)
-    data = select_year(proc_data,annee1,annee2,revenu)
-    return data
-    
-def select_year(df,year1,year2,revenu):
-    print('revenus')
-    print(revenu)
-    mask1 = df['year']==year1
-    mask2 = df['year']==year2
-    df1 = df.loc[mask1]
-    df2 = df.loc[mask2]
-    mask3 = (df1['combineRevenuMoins']<revenu)&(df1['combineRevenuPlus']>=revenu)
-    mask4 = (df2['combineRevenuMoins']<revenu)&(df2['combineRevenuPlus']>=revenu)
-    dff1 = df1.loc[mask3]
-    dff2 = df2.loc[mask4]
-    inflation2=dff2['inflation'].tolist()[0]
-    inflation1=dff1['inflation'].tolist()[0]
-    combineRevenuPlus2 = dff2['combineRevenuMoins'].tolist()[0]
-    combineTaux2 = dff2['combineTaux'].tolist()[0]
-    montantImpot2 = dff2['montantImpot'].tolist()[0]
-    revenu2 = (revenu*inflation1)/inflation2
-    dff3=df1.loc[(df1['combineRevenuMoins']<revenu2)&(df1['combineRevenuPlus']>=revenu2)]
-    combineRevenuPlus1 = dff3['combineRevenuMoins'].tolist()[0]
-    combineTaux1 = dff3['combineTaux'].tolist()[0]
-    montantImpot1 = dff3['montantImpot'].tolist()[0]
-    impot1 = (revenu2-combineRevenuPlus1)*combineTaux1+montantImpot1
-    impot2 = (revenu-combineRevenuPlus2)*combineTaux2+montantImpot2
-    d=[ revenu2*impot2/revenu, 
-        impot1, 
-        impot1*100/revenu2, 
-        revenu2, 
-        revenu*impot1/revenu2, 
-        impot2, 
-        impot2*100/revenu, 
-        revenu, 
-        year1, 
-        year2]
-    data=[round(num,2) for num in d]
-    
-    return data
-
-def convert_data(fileName):
-    df = pd.read_csv(fileName)
-    df.replace(np.nan,np.inf,inplace=True)
-    return df.drop(columns=['combineRevenuMoinsAjuste','combineRevenuPlusAjuste'])
-

@@ -10,7 +10,8 @@ from dash.dependencies import Input, Output, State
 import plotly.express as px
 import pandas as pd
 
-import testCallback as test
+import preprocess
+import draw_charts as draw
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -39,11 +40,11 @@ colors = {
 #     font_color=colors['text']
 # )
 
-dfScat = test.prepScatterDf()
-figScat = test.highlightScat(dfScat, 2020, 2000)
+dfScat = preprocess.prep_scatter_df()
+figScat = draw.highlight_scat(dfScat, 2020, 2000)
 
-dfBar = test.prep_data(50000, 2020, 2000)
-figBar = test.drawBar(dfBar, 2020, 2000)
+dfBar = preprocess.prep_data_bar(50000, 2020, 2000)
+figBar = draw.draw_bar(dfBar, 2020, 2000)
 
 app.layout = html.Div(style={'font-family':'georgia'}, children=[
     html.H1(
@@ -132,9 +133,9 @@ def update_year(n_clicks, revenus, annee1, annee2, barFig, scatterFig):
 
     if ctx.triggered:
         
-        figScatter = test.highlightScat(dfScat,annee1, annee2)
-        dfBar = test.prep_data(revenus, annee1, annee2)
-        figBar = test.drawBar(dfBar, annee1, annee2)
+        figScatter = draw.highlight_scat(dfScat,annee1, annee2)
+        dfBar = preprocess.prep_data_bar(revenus, annee1, annee2)
+        figBar = draw.draw_bar(dfBar, annee1, annee2)
 
         return 'Revenus: {}$'.format(revenus),figBar, figScatter
     

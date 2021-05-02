@@ -103,7 +103,6 @@ app.layout = html.Div(style={'font-family':'georgia'}, children=[
 ])
 
 @app.callback(
-    Output(component_id='vis1',   component_property='children'),
     Output(component_id='barChart',     component_property='figure'),
     Output(component_id='scatterChart',     component_property='figure'),
     Output(component_id='inputError',     component_property='children'),
@@ -116,11 +115,11 @@ app.layout = html.Div(style={'font-family':'georgia'}, children=[
     )
 def update_year(n_clicks, revenus, annee1, annee2, barFig, scatterFig):
     ctx = dash.callback_context
-    
+
     if ((any(value == None for value in (revenus, annee1, annee2))) or
         (any(value == ''   for value in (revenus, annee1, annee2)))):
         errorMess = 'Veuillez remplir tous les champs svp' if n_clicks != 0 else ''
-        return 'Revenus: {}$'.format(revenus), barFig, scatterFig, errorMess
+        return barFig, scatterFig, errorMess
         
     y1 = int(annee1)
     annee1 = int(annee2)
@@ -132,10 +131,10 @@ def update_year(n_clicks, revenus, annee1, annee2, barFig, scatterFig):
         figScatter = draw.highlight_scat(dfScat,annee1, annee2)
         dfBar = preprocess.prep_data_bar(revenus, annee1, annee2)
         figBar = draw.draw_bar(dfBar, annee1, annee2)
-        return 'Revenus: {}$'.format(revenus),figBar, figScatter, ''
+        return figBar, figScatter, ''
     
     figBar = barFig
-    return 'Revenus: {}$'.format(revenus),figBar, figScatter, ''
+    return figBar, figScatter, ''
 
 if __name__ == '__main__':
     app.run_server(debug=True)

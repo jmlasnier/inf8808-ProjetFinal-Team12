@@ -17,8 +17,6 @@ def prep_data_bar(revenu,annee1,annee2):
 
   
 def select_year_bar(df,year1,year2,revenu):
-    print('revenus')
-    print(revenu)
     mask1 = df['year']==year1
     mask2 = df['year']==year2
     df1 = df.loc[mask1]

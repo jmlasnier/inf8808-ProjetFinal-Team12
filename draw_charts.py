@@ -35,14 +35,28 @@ def highlight_scat(df, annee1, annee2):
     annee1 = int(annee1)
     annee2 = int(annee2)
     dfScatAnnee1 = df.loc[(df['year'] == annee1)]
-    figAnnee1 = px.scatter(dfScatAnnee1, x="year", y="combineRevenuMoinsAjuste", 
-                    color_discrete_sequence=['red'])
-    figAnnee1.update_traces(marker_line_width=3)
+    figAnnee1 = px.scatter(
+                    dfScatAnnee1,
+                    x="year",
+                    y="combineRevenuMoinsAjuste", 
+                    color_discrete_sequence=['red'],
+                    custom_data= ['combineTaux'])
+    figAnnee1.update_traces(
+        marker_line_width=3, 
+        hovertemplate = '''Année: %{x}<br>Palier: %{y}<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
+        )
 
     dfScatAnnee2 = df.loc[(df['year'] == annee2)]
-    figAnnee2 = px.scatter(dfScatAnnee2, x="year", y="combineRevenuMoinsAjuste", 
-                    color_discrete_sequence=['blue'])
-    figAnnee2.update_traces(marker_line_width=3)
+    figAnnee2 = px.scatter(
+                    dfScatAnnee2,
+                    x="year",
+                    y="combineRevenuMoinsAjuste", 
+                    color_discrete_sequence=['blue'],
+                    custom_data= ['combineTaux'])
+    figAnnee2.update_traces(
+        marker_line_width=3, 
+        hovertemplate = '''Année: %{x}<br>Palier: %{y}<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
+        )
 
     fig = draw_scatter(df, annee1, annee2)
     fig.add_trace(figAnnee1.data[0])

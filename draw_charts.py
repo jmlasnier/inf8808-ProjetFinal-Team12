@@ -9,8 +9,8 @@ import preprocess
 
 def draw_scatter(dfScat, year1, year2):
     dfScat1 = dfScat.drop(dfScat[(dfScat.year == year1) | (dfScat.year == year2)].index)
-    dfScat1["combineTaux"] = 100*dfScat1["combineTaux"].round(2)
-    # dfScat1["combineTaux"] = dfScat1["combineTaux"].round(2)
+    dfScat1["combineTaux"] = 100*dfScat1["combineTaux"]
+    dfScat1["combineTaux"] = dfScat1["combineTaux"].round(3)
     fig = px.scatter(dfScat1, 
                     x="year", 
                     y="combineRevenuMoinsAjuste", 

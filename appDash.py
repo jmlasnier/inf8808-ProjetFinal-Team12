@@ -71,41 +71,45 @@ app.layout = html.Div(style={'font-family':'georgia'}, children=[
 
     html.Div([
             html.Center(html.Div([
-                html.H3('Inputs', style={'textAlign': 'center','color': colors['text']}),
                 html.Div([
+                    html.Br(),
+                    html.Br(),
                     html.Label('Vous avez gagné un revenus de :'),
                     dcc.Input(id='revenus', placeholder='Revenus', type='number', value=50000 ,min=192, required=True, style={'width':'90%'})
                     ]),
-                # html.Br(),
+                html.Br(),
                 html.Center(),
                 html.Div([
                     html.Label('à l\'année : '),
                     dcc.Input(id='annee1', placeholder='1929 à 2020', type='number',
                                    value='2000', max=2020, min=1929, required=True, style={'width':'90%'})]),
-                # html.Br(),
+                html.Br(),
                 html.Div([
                     html.Label('Combien auriez vous payé d\'impôt à l\'année: '),
                     dcc.Input(id='annee2', placeholder='1929 à 2020', type='number', 
                                    value='2020', required=True, max=2020, min=1929, style={'width':'90%'})]),
                 html.Br(),
+                html.Br(),
                 html.Button('Calculer', id='button', n_clicks=0, disabled=False, style={'width':'90%'}),
                 html.Label(id='inputError', children='', style={'color':'red'}),
-            ],style={'width':'15%', 'height':'470px','float':'left', 'border': '4px solid grey', 'border-radius':'15px'}, className="six columns")),
+            ],style={'width':'18%', 'height':'470px','float':'left', 'border': '4px solid grey', 'border-radius':'15px'}, className="six columns")),
             html.Div([
-                html.H3('', id='vis1', style={ 'textAlign': 'center', 'color': colors['text'] }),
-                dcc.Graph(id='barChart', figure=figBar)
-            ],style={'width':'80%', 'height':'470px','float':'left', 'border': '4px solid grey', 'border-radius':'15px'}, className="six columns"),
+                dcc.Graph(id='barChart', figure=figBar, style={'height':'90%'}),
+                html.P(id='tauxEchange', children='   *Avec les taux de l’année2, l’impôt à payer pour l’année1 serait de X$. Avec les taux de l’année1, l’impôt à payer pour l’année2 serait de X$.'),
+            ],style={'width':'78%', 'height':'470px','float':'left', 'border': '4px solid grey', 'border-radius':'15px'}, className="six columns"),
         ],style={'width':'80%','margin':'auto', 'padding':'10px'}, className="row"),
-    dcc.Graph(
+    html.Div([
+        dcc.Graph(
         id='scatterChart',
-        figure=figScat
-    )
+        figure=figScat)
+    ],style={ 'border': '4px solid grey', 'border-radius':'15px'})
 ])
 
 @app.callback(
     Output(component_id='barChart',     component_property='figure'),
     Output(component_id='scatterChart',     component_property='figure'),
     Output(component_id='inputError',     component_property='children'),
+    Output(component_id='tauxEchange',     component_property='children'),
     Input( component_id='button', component_property='n_clicks'),
     State( component_id='revenus',component_property='value'),
     State( component_id='annee1', component_property='value'),
@@ -118,8 +122,8 @@ def update_year(n_clicks, revenus, annee1, annee2, barFig, scatterFig):
 
     if ((any(value == None for value in (revenus, annee1, annee2))) or
         (any(value == ''   for value in (revenus, annee1, annee2)))):
-        errorMess = 'Veuillez remplir tous les champs svp' if n_clicks != 0 else ''
-        return barFig, scatterFig, errorMess
+        errorMess = 'Veuillez remplir correctement tous les champs svp.' if n_clicks != 0 else ''
+        return barFig, scatterFig, errorMess, ''
         
     y1 = int(annee1)
     annee1 = int(annee2)
@@ -130,11 +134,17 @@ def update_year(n_clicks, revenus, annee1, annee2, barFig, scatterFig):
     if ctx.triggered:
         figScatter = draw.highlight_scat(dfScat,annee1, annee2)
         dfBar = preprocess.prep_data_bar(revenus, annee1, annee2)
+        # print(dfBar)
+        x = dfBar[0]
+        y = dfBar[4]
+        print(x)
+        print(y)
+        detail = '*L’impôt à payer pour {}, avec les taux d\'imposition de {}, serait de {}$. L’impôt à payer pour {}, avec les taux d\'imposition de {}, serait de {}$'.format(annee2, annee1, y, annee1, annee2, x)
         figBar = draw.draw_bar(dfBar, annee1, annee2)
-        return figBar, figScatter, ''
+        return figBar, figScatter, '', detail
     
     figBar = barFig
-    return figBar, figScatter, ''
+    return figBar, figScatter, '', '*L’impôt à payer pour 2000, avec les taux d\'imposition de 2020, serait de 12468.13$. L’impôt à payer pour 2020, avec les taux d\'imposition de 2000, serait de 23047.03$'
 
 if __name__ == '__main__':
     app.run_server(debug=True)

@@ -25,7 +25,7 @@ def draw_scatter(dfScat, year1, year2):
         hovertemplate = '''Année: %{x}<br>Palier: %{y}<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
         )
     fig.update_layout(
-        yaxis_title="Revenus en échelle log",
+        yaxis_title="Revenus en échelle log ($)",
         xaxis_title="Année",
         
     )
@@ -39,7 +39,7 @@ def highlight_scat(df, annee1, annee2):
                     dfScatAnnee1,
                     x="year",
                     y="combineRevenuMoinsAjuste", 
-                    color_discrete_sequence=['red'],
+                    color_discrete_sequence=['blue'],
                     custom_data= ['combineTaux'])
     figAnnee1.update_traces(
         marker_line_width=3, 
@@ -51,7 +51,7 @@ def highlight_scat(df, annee1, annee2):
                     dfScatAnnee2,
                     x="year",
                     y="combineRevenuMoinsAjuste", 
-                    color_discrete_sequence=['blue'],
+                    color_discrete_sequence=['red'],
                     custom_data= ['combineTaux'])
     figAnnee2.update_traces(
         marker_line_width=3, 
@@ -62,6 +62,10 @@ def highlight_scat(df, annee1, annee2):
     fig.add_trace(figAnnee1.data[0])
     fig.add_trace(figAnnee2.data[0])
     fig.update_traces(marker_symbol="line-ew-open")
+    fig.update_layout(
+        font_family="georgia",
+        title_font_size=30,
+    )
     return fig
     
 
@@ -93,20 +97,26 @@ def draw_bar(data, annee1, annee2):
     
     fig.add_trace(go.Bar(
         x = data1[0:4],
-        y = ['Impot avec taux de l\'autre annee' ,'Impôts  ','Taux moyen  ','Revenu  '],
+        y = ['Taux échangés*' ,'Impôts  ','Taux moyen  ','Revenu  '],
         orientation = 'h',
         base = 0,
-        customdata = [str(data[0])+'$',str(data[1])+'$',str(data[2])+'%',str(data[3])+'$'],
+        customdata = ["{:,}".format(data[0]).replace(",", " ").replace(".", ",")+'$',
+                      "{:,}".format(data[1]).replace(",", " ").replace(".", ",")+'$',
+                      str(data[2]).replace(".", ",")+'%',
+                      "{:,}".format(data[3]).replace(",", " ").replace(".", ",")+'$'],
         texttemplate = "<b>%{customdata}</b>",
         textposition = "outside",
         name = str(annee1)
         ))
     fig.add_trace(go.Bar(
         x = data1[4:8],
-        y = ['Impot avec taux de l\'autre annee','Impôts  ','Taux moyen  ','Revenu  '],
+        y = ['Taux échangés*','Impôts  ','Taux moyen  ','Revenu  '],
         orientation = 'h',
         base = 0,
-        customdata = [str(data[4])+'$',str(data[5])+'$',str(data[6])+'%',str(data[7])+'$'],
+        customdata = ["{:,}".format(data[4]).replace(",", " ").replace(".", ",")+'$',
+                      "{:,}".format(data[5]).replace(",", " ").replace(".", ",")+'$',
+                      str(data[6]).replace(".", ",")+'%',
+                      "{:,}".format(data[7]).replace(",", " ").replace(".", ",")+'$'],
         texttemplate = '<span style="margin-left:auto; margin-right:auto"><b>%{customdata}</b>',
         textposition = "outside",
         hovertemplate = None,
@@ -114,14 +124,20 @@ def draw_bar(data, annee1, annee2):
         ))
     fig.update_layout(
         barmode = 'stack',
-        title={'text':str(annee2) +f" vs " + str(annee1),
+        title={'text': 'Comparaison de l\'année ' + str(annee2) +f" avec " + str(annee1),
         'x':0.5,
         'xanchor':'center'},
+        title_font_size=30,
+        font_size = 15,
+        font_family="georgia",
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         xaxis=dict(range=[-150, 150])
     )
     fig.update_xaxes(
         visible = False
+    )
+    fig.update_traces(
+        hovertemplate= '''<b>%{y}:</b> %{customdata}<br><extra></extra>'''
     )
     return fig

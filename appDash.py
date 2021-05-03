@@ -138,7 +138,6 @@ def update_year(n_clicks, revenus, annee1, annee2, barFig, scatterFig, tauxInver
     if ctx.triggered:
         figScatter = draw.highlight_scat(dfScat,annee1, annee2)
         dfBar = preprocess.prep_data_bar(revenus, annee1, annee2)
-        # print(dfBar)
         tauxInvAnnee1 = dfBar[0]
         tauxInvAnnee2 = dfBar[4]
         detail = '''*L’impôt à payer pour {}, en utilisant les taux d\'imposition de {}, serait de {}$. 

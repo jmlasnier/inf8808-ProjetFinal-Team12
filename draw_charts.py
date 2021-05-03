@@ -10,19 +10,19 @@ import preprocess
 def draw_scatter(dfScat, year1, year2):
     dfScat1 = dfScat.drop(dfScat[(dfScat.year == year1) | (dfScat.year == year2)].index)
     dfScat1["combineTaux"] = 100*dfScat1["combineTaux"].round(2)
-    dfScat1["combineTaux"] = dfScat1["combineTaux"].round(2)
+    # dfScat1["combineTaux"] = dfScat1["combineTaux"].round(2)
     fig = px.scatter(dfScat1, 
                     x="year", 
                     y="combineRevenuMoinsAjuste", 
                     log_y = True,
                     range_y=[5000, 10000000],
-                    title='Paliers d\'impots Canadiens de 1928 à 2020 en dollars courant',
+                    title='Paliers d\'impots Québecois de 1929 à 2020 en dollars courant',
                     color_discrete_sequence=['black'],
                     height=800,
                     custom_data= ['combineTaux'])
     fig.update_traces(
         marker_symbol="line-ew-open",
-        hovertemplate = '''Année: %{x}<br>Palier: %{y}<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
+        hovertemplate = '''Année: %{x}<br>Palier: %{y:,}$<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
         )
     fig.update_layout(
         yaxis_title="Revenus en échelle log ($)",
@@ -34,7 +34,8 @@ def draw_scatter(dfScat, year1, year2):
 def highlight_scat(df, annee1, annee2):
     annee1 = int(annee1)
     annee2 = int(annee2)
-    dfScatAnnee1 = df.loc[(df['year'] == annee1)]
+    dfScatAnnee1 = df.loc[(df['year'] == annee1)].copy()
+    dfScatAnnee1["combineTaux"] = 100*dfScatAnnee1["combineTaux"].round(2)
     figAnnee1 = px.scatter(
                     dfScatAnnee1,
                     x="year",
@@ -43,10 +44,11 @@ def highlight_scat(df, annee1, annee2):
                     custom_data= ['combineTaux'])
     figAnnee1.update_traces(
         marker_line_width=3, 
-        hovertemplate = '''Année: %{x}<br>Palier: %{y}<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
+        hovertemplate = '''Année: %{x}<br>Palier: %{y:,}$<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
         )
 
-    dfScatAnnee2 = df.loc[(df['year'] == annee2)]
+    dfScatAnnee2 = df.loc[(df['year'] == annee2)].copy()
+    dfScatAnnee2["combineTaux"] = 100*dfScatAnnee2["combineTaux"].round(2)
     figAnnee2 = px.scatter(
                     dfScatAnnee2,
                     x="year",
@@ -55,7 +57,7 @@ def highlight_scat(df, annee1, annee2):
                     custom_data= ['combineTaux'])
     figAnnee2.update_traces(
         marker_line_width=3, 
-        hovertemplate = '''Année: %{x}<br>Palier: %{y}<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
+        hovertemplate = '''Année: %{x}<br>Palier: %{y:,}$<br>Taux d'imposition: %{customdata}%<br><extra></extra>'''
         )
 
     fig = draw_scatter(df, annee1, annee2)
